@@ -3,10 +3,18 @@
     <q-page class="flex flex-center bg-grey-2">
       <q-card class="q-pa-lg shadow-2 rounded-borders" style="width: 350px">
         <q-card-section>
-          <div class="text-h6 text-center">Login</div>
+          <div class="text-h6 text-center">Criar conta</div>
         </q-card-section>
 
         <q-card-section>
+          <q-input
+            v-model="name"
+            label="Nome"
+            outlined
+            dense
+            type="text"
+            class="q-mb-md"
+          />
           <q-input
             v-model="email"
             label="E-mail"
@@ -45,6 +53,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+const name = ref<string>('')
 const email = ref<string>('')
 const password = ref<string>('')
 
