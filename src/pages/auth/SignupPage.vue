@@ -43,7 +43,7 @@
         <q-separator spaced />
 
         <q-card-section class="text-center">
-          <q-btn :to="{ name: 'signup' }" flat label="Criar conta" size="sm" color="primary" />
+          <q-btn :to="{ name: 'login' }" flat label="Já tenho conta" size="sm" color="primary" />
         </q-card-section>
       </q-card>
     </q-page>
