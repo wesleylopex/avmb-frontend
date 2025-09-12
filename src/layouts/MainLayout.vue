@@ -6,7 +6,15 @@
 
         <q-toolbar-title> Quasar App </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>
+          <q-toggle
+            v-model="themeIsDark"
+            :true-value="true"
+            :false-value="false"
+            label="Dark Mode"
+            @update:model-value="toggleTheme"
+          />
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -24,6 +32,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useQuasar } from 'quasar';
 import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
 
 const linksList: EssentialLinkProps[] = [
@@ -37,13 +46,13 @@ const linksList: EssentialLinkProps[] = [
     title: 'Usuários',
     caption: '',
     icon: 'group',
-    route: { name: 'home' },
+    route: { name: 'users' },
   },
   {
     title: 'Gerenciar acessos',
     caption: '',
     icon: 'lock_open',
-    route: { name: 'home' },
+    route: { name: 'accesses' },
   },
   {
     title: 'Sair',
@@ -55,7 +64,22 @@ const linksList: EssentialLinkProps[] = [
 
 const leftDrawerOpen = ref(false);
 
-function toggleLeftDrawer() {
+function toggleLeftDrawer () {
   leftDrawerOpen.value = !leftDrawerOpen.value;
+}
+
+const $q = useQuasar();
+const themeIsDark = ref($q.dark.isActive);
+
+const savedTheme = localStorage.getItem('themeIsDark');
+
+if (savedTheme !== null) {
+  themeIsDark.value = savedTheme === 'true';
+  $q.dark.set(themeIsDark.value);
+}
+
+function toggleTheme () {
+  $q.dark.toggle();
+  localStorage.setItem('themeIsDark', String(themeIsDark.value));
 }
 </script>
