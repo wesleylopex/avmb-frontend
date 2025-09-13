@@ -21,7 +21,13 @@
             <q-icon name="search" />
           </template>
         </q-input>
-        <q-btn color="primary" label="Adicionar acesso" icon="add" />
+        <q-btn
+          color="primary"
+          label="Adicionar acesso"
+          icon="add"
+          @click="isCreateAccessOpen = true"
+          @close="isCreateAccessOpen = false"
+        />
       </q-card-section>
       <div class="q-pa-md w-full">
         <q-markup-table>
@@ -58,15 +64,18 @@
     </q-card>
   </q-page>
 
+  <CreateAccess :is-open="isCreateAccessOpen" @close="isCreateAccessOpen = false" />
+
   <RevokeConfirmation
-    :is-open="isDialogOpen"
+    :is-open="isRevokeConfirmationOpen"
     :access-id="selectedAccessId"
-    @close="isDialogOpen = false"
+    @close="isRevokeConfirmationOpen = false"
     @confirm="revoke"
   />
 </template>
 
 <script lang="ts" setup>
+import CreateAccess from './CreateAccess.vue'
 import RevokeConfirmation from './RevokeConfirmation.vue'
 
 import { ref, computed } from 'vue'
@@ -81,7 +90,9 @@ interface Access {
   revokedAt?: string | null
 }
 
-const isDialogOpen = ref<boolean>(false)
+const isCreateAccessOpen = ref<boolean>(false)
+
+const isRevokeConfirmationOpen = ref<boolean>(false)
 const selectedAccessId = ref<number | null>(null)
 
 const search = ref('')
@@ -105,7 +116,7 @@ const filteredAccesses = computed(() => {
 })
 
 function openRevokeConfirmation (accessId: number): void {
-  isDialogOpen.value = true
+  isRevokeConfirmationOpen.value = true
   selectedAccessId.value = accessId
 }
 
@@ -117,8 +128,6 @@ function isExpiringSoon (access: Access): boolean {
   if (access.revokedAt) return false
 
   const expiresAt = new Date(access.expiresAt)
-
-  console.log('expiresAt', expiresAt)
 
   const now = new Date()
   const diffInMs = expiresAt.getTime() - now.getTime()
