@@ -37,7 +37,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr v-for="access in filteredAccesses" :key="access.id">
               <td class="text-left">Bianca Sabrina</td>
               <td class="text-left">Recursos</td>
               <td class="text-left">Wesley Lopes</td>
@@ -45,18 +45,7 @@
               <td class="text-left">20/09/2025 13:56</td>
               <td class="text-left">16/09/2025 17:30</td>
               <td class="text-left">
-                <q-btn outline size="sm" color="red" label="Revogar" icon="close" />
-              </td>
-            </tr>
-            <tr>
-              <td class="text-left">Carlos</td>
-              <td class="text-left">Usuários</td>
-              <td class="text-left">Wesley Lopes</td>
-              <td class="text-left">13/09/2025 13:58</td>
-              <td class="text-left">20/09/2025 13:58</td>
-              <td class="text-left"></td>
-              <td class="text-left">
-                <q-btn outline size="sm" color="red" label="Revogar" icon="close" />
+                <q-btn @click="openRevokeConfirmation(access.id)" outline size="sm" color="red" label="Revogar" icon="close" />
               </td>
             </tr>
           </tbody>
@@ -64,9 +53,58 @@
       </div>
     </q-card>
   </q-page>
+
+  <RevokeConfirmation
+    :is-open="isDialogOpen"
+    :access-id="selectedAccessId"
+    @close="isDialogOpen = false"
+    @confirm="revoke"
+  />
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import RevokeConfirmation from './RevokeConfirmation.vue'
+
+import { ref, computed } from 'vue'
+
+interface Access {
+  id: number
+  userId: number
+  resourceId: string
+  grantedBy: number
+  grantedAt: string
+  expiresAt: string
+  revokedAt?: string | null
+}
+
+const isDialogOpen = ref<boolean>(false)
+const selectedAccessId = ref<number | null>(null)
+
 const search = ref('')
+
+const accesses = ref<Access[]>([
+  { id: 1, userId: 1, resourceId: 'Recursos', grantedBy: 2, grantedAt: '13/09/2025 13:56', expiresAt: '20/09/2025 13:56', revokedAt: '16/09/2025 17:30' },
+  { id: 2, userId: 3, resourceId: 'Usuários', grantedBy: 2, grantedAt: '13/09/2025 13:58', expiresAt: '20/09/2025 13:58', revokedAt: null }
+])
+
+const filteredAccesses = computed(() => {
+  if (!search.value) {
+    return accesses.value
+  }
+  const searchLower = search.value.toLowerCase()
+  return accesses.value.filter(access =>
+    access.userId.toString().toLowerCase().includes(searchLower) ||
+    access.resourceId.toLowerCase().includes(searchLower) ||
+    access.grantedBy.toString().toLowerCase().includes(searchLower)
+  )
+})
+
+function openRevokeConfirmation (accessId: number): void {
+  isDialogOpen.value = true
+  selectedAccessId.value = accessId
+}
+
+function revoke (accessId: number | null): void {
+  console.log('Revogar acesso com ID:', accessId)
+}
 </script>
