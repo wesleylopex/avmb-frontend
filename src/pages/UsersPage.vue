@@ -57,18 +57,12 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-
-interface User {
-  name: string
-  email: string
-  status: 'pending' | 'approved' | 'rejected'
-  createdAt: string
-}
+import type { User } from 'src/types/user'
 
 const users = ref<User[]>([
-  { name: 'Wesley Lopes', email: 'wesleylopes@gmail.com', status: 'pending', createdAt: '13/09/2025 00:12' },
-  { name: 'Bianca Sabrina', email: 'biancasabrina@gmail.com', status: 'approved', createdAt: '13/09/2025 00:10' },
-  { name: 'Carlos Medim', email: 'carlosmedim@gmail.com', status: 'rejected', createdAt: '12/09/2025 13:22' }
+  { id: 1, name: 'Wesley Lopes', email: 'wesleylopes@gmail.com', role: 'admin', status: 'pending', createdAt: '13/09/2025 00:12', updatedAt: null },
+  { id: 2, name: 'Bianca Sabrina', email: 'biancasabrina@gmail.com', role: 'admin', status: 'approved', createdAt: '13/09/2025 00:10', updatedAt: null },
+  { id: 3, name: 'Carlos Medim', email: 'carlosmedim@gmail.com', role: 'user', status: 'rejected', createdAt: '12/09/2025 13:22', updatedAt: null }
 ])
 
 const search = ref('')
