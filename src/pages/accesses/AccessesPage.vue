@@ -37,13 +37,17 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="access in filteredAccesses" :key="access.id">
+            <tr
+              v-for="access in filteredAccesses"
+              :key="access.id"
+              :class="{ 'bg-yellow-2': isExpiringSoon(access) }"
+            >
               <td class="text-left">Bianca Sabrina</td>
               <td class="text-left">Recursos</td>
               <td class="text-left">Wesley Lopes</td>
-              <td class="text-left">13/09/2025 13:56</td>
-              <td class="text-left">20/09/2025 13:56</td>
-              <td class="text-left">16/09/2025 17:30</td>
+              <td class="text-left">{{ new Date(access.grantedAt).toLocaleString() }}</td>
+              <td class="text-left">{{ new Date(access.expiresAt).toLocaleString() }}</td>
+              <td class="text-left">{{ access.revokedAt && new Date(access.revokedAt).toLocaleString() }}</td>
               <td class="text-left">
                 <q-btn @click="openRevokeConfirmation(access.id)" outline size="sm" color="red" label="Revogar" icon="close" />
               </td>
@@ -70,7 +74,7 @@ import { ref, computed } from 'vue'
 interface Access {
   id: number
   userId: number
-  resourceId: string
+  resourceId: number
   grantedBy: number
   grantedAt: string
   expiresAt: string
@@ -83,8 +87,9 @@ const selectedAccessId = ref<number | null>(null)
 const search = ref('')
 
 const accesses = ref<Access[]>([
-  { id: 1, userId: 1, resourceId: 'Recursos', grantedBy: 2, grantedAt: '13/09/2025 13:56', expiresAt: '20/09/2025 13:56', revokedAt: '16/09/2025 17:30' },
-  { id: 2, userId: 3, resourceId: 'Usuários', grantedBy: 2, grantedAt: '13/09/2025 13:58', expiresAt: '20/09/2025 13:58', revokedAt: null }
+  { id: 1, userId: 1, resourceId: 1, grantedBy: 2, grantedAt: '2025-09-13 13:56', expiresAt: '2025-09-20 13:56', revokedAt: '2025-09-16 17:30' },
+  { id: 2, userId: 3, resourceId: 1, grantedBy: 2, grantedAt: '2025-09-13 13:58', expiresAt: '2025-09-13 21:00', revokedAt: null },
+  { id: 3, userId: 3, resourceId: 1, grantedBy: 2, grantedAt: '2025-09-13 13:58', expiresAt: '2025-09-13 21:00', revokedAt: null },
 ])
 
 const filteredAccesses = computed(() => {
@@ -94,7 +99,7 @@ const filteredAccesses = computed(() => {
   const searchLower = search.value.toLowerCase()
   return accesses.value.filter(access =>
     access.userId.toString().toLowerCase().includes(searchLower) ||
-    access.resourceId.toLowerCase().includes(searchLower) ||
+    access.resourceId.toString().includes(searchLower) ||
     access.grantedBy.toString().toLowerCase().includes(searchLower)
   )
 })
@@ -106,5 +111,19 @@ function openRevokeConfirmation (accessId: number): void {
 
 function revoke (accessId: number | null): void {
   console.log('Revogar acesso com ID:', accessId)
+}
+
+function isExpiringSoon (access: Access): boolean {
+  if (access.revokedAt) return false
+
+  const expiresAt = new Date(access.expiresAt)
+
+  console.log('expiresAt', expiresAt)
+
+  const now = new Date()
+  const diffInMs = expiresAt.getTime() - now.getTime()
+  const diffInHours = diffInMs / (1000 * 60 * 60)
+
+  return diffInHours > 0 && diffInHours <= 1
 }
 </script>
