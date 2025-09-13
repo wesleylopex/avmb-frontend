@@ -29,7 +29,7 @@
               <th class="text-left">Nome</th>
               <th class="text-left">E-mail</th>
               <th class="text-left">Status</th>
-              <th class="text-left">Se cadastrou em</th>
+              <th class="text-left">Data de cadasto</th>
               <th class="text-left">Ações</th>
             </tr>
           </thead>
