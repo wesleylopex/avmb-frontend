@@ -40,7 +40,7 @@
               <td class="text-left">
                 <q-badge :color="getStatusColor(user.status)" :label="getStatusLabel(user.status)" />
               </td>
-              <td class="text-left">{{ user.createdAt }}</td>
+              <td class="text-left">{{ new Date(user.createdAt).toLocaleString() }}</td>
               <td class="text-left">
                 <div v-show="user.status === 'pending'">
                   <q-btn @click="approve(user.email)" outline size="sm" color="green" label="Aprovar" icon="check" class="q-mr-sm" />
@@ -60,9 +60,9 @@ import { ref, computed } from 'vue'
 import type { User } from 'src/types/user'
 
 const users = ref<User[]>([
-  { id: 1, name: 'Wesley Lopes', email: 'wesleylopes@gmail.com', role: 'admin', status: 'pending', createdAt: '13/09/2025 00:12', updatedAt: null },
-  { id: 2, name: 'Bianca Sabrina', email: 'biancasabrina@gmail.com', role: 'admin', status: 'approved', createdAt: '13/09/2025 00:10', updatedAt: null },
-  { id: 3, name: 'Carlos Medim', email: 'carlosmedim@gmail.com', role: 'user', status: 'rejected', createdAt: '12/09/2025 13:22', updatedAt: null }
+  { id: 1, name: 'Wesley Lopes', email: 'wesleylopes@gmail.com', role: 'admin', status: 'pending', createdAt: '2025-09-13 10:12', updatedAt: null },
+  { id: 2, name: 'Bianca Sabrina', email: 'biancasabrina@gmail.com', role: 'admin', status: 'approved', createdAt: '2025-09-13 16:10', updatedAt: null },
+  { id: 3, name: 'Carlos Medim', email: 'carlosmedim@gmail.com', role: 'user', status: 'rejected', createdAt: '2025-09-12 09:22', updatedAt: null }
 ])
 
 const search = ref('')
