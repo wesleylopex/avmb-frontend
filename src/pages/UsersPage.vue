@@ -38,11 +38,11 @@
               <td class="text-left">{{ user.name }}</td>
               <td class="text-left">{{ user.email }}</td>
               <td class="text-left">
-                <q-badge :color="colorByStatus(user.status)" :label="user.status" />
+                <q-badge :color="getStatusColor(user.status)" :label="getStatusLabel(user.status)" />
               </td>
-              <td class="text-left">13/09/2025 00:12</td>
+              <td class="text-left">{{ user.createdAt }}</td>
               <td class="text-left">
-                <div v-show="user.status === 'Pendente'">
+                <div v-show="user.status === 'pending'">
                   <q-btn @click="approve(user.email)" outline size="sm" color="green" label="Aprovar" icon="check" class="q-mr-sm" />
                   <q-btn outline size="sm" color="red" label="Reprovar" icon="close" />
                 </div>
@@ -55,53 +55,55 @@
   </q-page>
 </template>
 
-<script lang="ts">
-  import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, computed } from 'vue'
 
-  interface User {
-    name: string
-    email: string
-    status: string
-    date: string
-  }
+interface User {
+  name: string
+  email: string
+  status: 'pending' | 'approved' | 'rejected'
+  createdAt: string
+}
 
-  export default {
-    name: 'UsersPage',
-    setup () {
-      return {
-        colorByStatus (status: string): string {
-          const options: Record<string, string> = {
-            'Pendente': 'orange',
-            'Aprovado': 'green',
-            'Reprovado': 'red'
-          }
-          return options[status] || 'orange'
-        },
-        search: ref(''),
-        users: ref<User[]>([
-          { name: 'Wesley Lopes', email: 'wesleylopes@gmail.com', status: 'Pendente', date: '13/09/2025 00:12' },
-          { name: 'Bianca Sabrina', email: 'biancasabrina@gmail.com', status: 'Aprovado', date: '13/09/2025 00:10' },
-          { name: 'Carlos Medim', email: 'carlosmedim@gmail.com', status: 'Reprovado', date: '12/09/2025 13:22' }
-        ])
-      }
-    },
-    methods: {
-      approve (userEmail: string) {
-        console.log(`Aprovando usuário com email: ${userEmail}`)
-      }
-    },
-    computed: {
-      filteredUsers (): User[] {
-        if (!this.search) {
-          return this.users
-        }
-        const searchLower = this.search.toLowerCase()
-        return this.users.filter(user =>
-          user.name.toLowerCase().includes(searchLower) ||
-          user.email.toLowerCase().includes(searchLower) ||
-          user.status.toLowerCase().includes(searchLower)
-        )
-      }
-    }
+const users = ref<User[]>([
+  { name: 'Wesley Lopes', email: 'wesleylopes@gmail.com', status: 'pending', createdAt: '13/09/2025 00:12' },
+  { name: 'Bianca Sabrina', email: 'biancasabrina@gmail.com', status: 'approved', createdAt: '13/09/2025 00:10' },
+  { name: 'Carlos Medim', email: 'carlosmedim@gmail.com', status: 'rejected', createdAt: '12/09/2025 13:22' }
+])
+
+const search = ref('')
+
+const filteredUsers = computed(() => {
+  if (!search.value) {
+    return users.value
   }
+  const searchLower = search.value.toLowerCase()
+  return users.value.filter(user =>
+    user.name.toLowerCase().includes(searchLower) ||
+    user.email.toLowerCase().includes(searchLower) ||
+    user.status.toLowerCase().includes(searchLower)
+  )
+})
+
+function approve (userEmail: string): void {
+  console.log(`Aprovando usuário com email: ${userEmail}`)
+}
+
+function getStatusColor (status: string): string {
+  const options: Record<string, string> = {
+    pending: 'orange',
+    approved: 'green',
+    rejected: 'red'
+  }
+  return options[status] || 'orange'
+}
+
+function getStatusLabel (status: string): string {
+  const options: Record<string, string> = {
+    pending: 'Pendente',
+    approved: 'Aprovado',
+    rejected: 'Rejeitado'
+  }
+  return options[status] || 'Pendente'
+}
 </script>
