@@ -2,7 +2,7 @@
   <q-page padding>
     <q-card>
       <q-card-section>
-        <div class="text-h6">Gerenciar acesos</div>
+        <div class="text-h6">Gerenciar acessos</div>
         <div class="text-subtitle2">Gerencie os permissões dos usuários no sistema</div>
       </q-card-section>
       <q-separator />
