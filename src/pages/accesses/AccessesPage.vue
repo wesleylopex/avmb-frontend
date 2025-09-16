@@ -75,20 +75,14 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, computed, onMounted } from 'vue'
+
+import { getAccesses } from '../../services/access-service'
+
 import CreateAccess from './CreateAccess.vue'
 import RevokeConfirmation from './RevokeConfirmation.vue'
 
-import { ref, computed } from 'vue'
-
-interface Access {
-  id: number
-  userId: number
-  resourceId: number
-  grantedBy: number
-  grantedAt: string
-  expiresAt: string
-  revokedAt?: string | null
-}
+import type { Access } from '../../types/access'
 
 const isCreateAccessOpen = ref<boolean>(false)
 
@@ -97,11 +91,15 @@ const selectedAccessId = ref<number | null>(null)
 
 const search = ref('')
 
-const accesses = ref<Access[]>([
-  { id: 1, userId: 1, resourceId: 1, grantedBy: 2, grantedAt: '2025-09-13 13:56', expiresAt: '2025-09-20 13:56', revokedAt: '2025-09-16 17:30' },
-  { id: 2, userId: 3, resourceId: 1, grantedBy: 2, grantedAt: '2025-09-13 13:58', expiresAt: '2025-09-13 21:00', revokedAt: null },
-  { id: 3, userId: 3, resourceId: 1, grantedBy: 2, grantedAt: '2025-09-13 13:58', expiresAt: '2025-09-13 21:00', revokedAt: null },
-])
+const accesses = ref<Access[]>([])
+
+onMounted(async () => {
+  try {
+    accesses.value = await getAccesses()
+  } catch (error) {
+    console.log(error)
+  }
+})
 
 const filteredAccesses = computed(() => {
   if (!search.value) {
@@ -109,9 +107,9 @@ const filteredAccesses = computed(() => {
   }
   const searchLower = search.value.toLowerCase()
   return accesses.value.filter(access =>
-    access.userId.toString().toLowerCase().includes(searchLower) ||
-    access.resourceId.toString().includes(searchLower) ||
-    access.grantedBy.toString().toLowerCase().includes(searchLower)
+    access.user.name.toString().toLowerCase().includes(searchLower) ||
+    access.resource.name.toString().toLowerCase().includes(searchLower) ||
+    access.grantedByUser.name.toString().toLowerCase().includes(searchLower)
   )
 })
 
