@@ -10,10 +10,11 @@ interface SignupData {
 export const login = async (email: string, password: string) => {
   try {
     const response = await api.post('/auth/login', { email, password })
-    console.log(response)
     return response.data
   } catch (error) {
-    console.log(error)
+    const err = error as AxiosError<{ message: string }>
+    const message = err.response?.data?.message || 'Erro no cadastro'
+    throw new Error(message)
   }
 }
 
