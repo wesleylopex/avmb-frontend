@@ -56,16 +56,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import type { User } from 'src/types/user'
 
-const users = ref<User[]>([
-  { id: 1, name: 'Wesley Lopes', email: 'wesleylopes@gmail.com', role: 'admin', status: 'pending', createdAt: '2025-09-13 10:12', updatedAt: null },
-  { id: 2, name: 'Bianca Sabrina', email: 'biancasabrina@gmail.com', role: 'admin', status: 'approved', createdAt: '2025-09-13 16:10', updatedAt: null },
-  { id: 3, name: 'Carlos Medim', email: 'carlosmedim@gmail.com', role: 'user', status: 'rejected', createdAt: '2025-09-12 09:22', updatedAt: null }
-])
+import { getUsers } from '../services/user-service'
 
+const users = ref<User[]>([])
 const search = ref('')
+
+onMounted(async () => {
+  try {
+    users.value = await getUsers()
+  } catch (error) {
+    console.log(error)
+  }
+})
 
 const filteredUsers = computed(() => {
   if (!search.value) {
