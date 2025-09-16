@@ -2,7 +2,7 @@
   <q-page padding>
     <q-card>
       <q-card-section>
-        <div class="text-h6">Bem-vindo(a) Wesley</div>
+        <div class="text-h6">Bem-vindo(a) {{ authStore.user?.name }}</div>
         <div class="text-subtitle2">Use o menu para navegar entre as seções</div>
       </q-card-section>
       <q-separator />
@@ -68,4 +68,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from 'src/stores/auth'
+
+const authStore = useAuthStore()
 </script>
