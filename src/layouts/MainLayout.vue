@@ -61,6 +61,12 @@ const linksList: EssentialLinkProps[] = [
     route: { name: 'users' },
   },
   {
+    title: 'Recursos',
+    caption: '',
+    icon: 'list',
+    route: { name: 'resources' },
+  },
+  {
     title: 'Gerenciar acessos',
     caption: '',
     icon: 'lock_open',
