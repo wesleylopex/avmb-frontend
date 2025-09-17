@@ -7,6 +7,7 @@ interface JwtPayload {
   sub: number
   name: string
   email: string
+  role: 'user' | 'admin'
 }
 
 export const useAuthStore = defineStore('auth', () => {

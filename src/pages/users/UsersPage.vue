@@ -30,7 +30,7 @@
               <th class="text-left">E-mail</th>
               <th class="text-left">Status</th>
               <th class="text-left">Data de cadasto</th>
-              <th class="text-left">Ações</th>
+              <th v-if="loggedUser?.role === 'admin'" class="text-left">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -41,7 +41,7 @@
                 <q-badge :color="getStatusColor(user.status)" :label="getStatusLabel(user.status)" />
               </td>
               <td class="text-left">{{ new Date(user.createdAt).toLocaleString() }}</td>
-              <td class="text-left">
+              <td v-if="loggedUser?.role === 'admin'" class="text-left">
                 <div v-show="user.status === 'pending'">
                   <q-btn @click="approve(user.id)" outline size="sm" color="green" label="Aprovar" icon="check" class="q-mr-sm" />
                   <q-btn @click="reject(user.id)" outline size="sm" color="red" label="Reprovar" icon="close" />
@@ -55,6 +55,7 @@
   </q-page>
 
   <SetStatus
+    v-if="loggedUser?.role === 'admin'"
     :is-open="setStatusIsOpen"
     :user-id="setStatusUserId"
     :status="setStatusStatus"
@@ -67,9 +68,12 @@
 import { ref, computed, onMounted } from 'vue'
 import SetStatus from './SetStatus.vue'
 
-import type { User } from 'src/types/user'
+import { useAuthStore } from '../../stores/auth'
+
+const { user: loggedUser } = useAuthStore()
 
 import { getUsers, setStatus } from '../../services/user-service'
+import type { User } from 'src/types/user'
 
 const users = ref<User[]>([])
 const search = ref('')
