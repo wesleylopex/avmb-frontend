@@ -1,10 +1,5 @@
 import type { User } from './user'
-
-interface Resource {
-  id: number
-  name: string
-  slug: string
-}
+import type { Resource } from './resource'
 
 export interface Access {
   id: number
@@ -14,4 +9,10 @@ export interface Access {
   grantedAt: string
   expiresAt: string
   revokedAt: string | null
+}
+
+export interface CreateAccessPayload {
+  userId: number
+  resourceId: number
+  expiresAt: string
 }
