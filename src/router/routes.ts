@@ -10,7 +10,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/users',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', name: 'users', component: () => import('pages/UsersPage.vue') }],
+    children: [{ path: '', name: 'users', component: () => import('pages/users/UsersPage.vue') }],
     meta: { requiresAuth: true }
   },
   {

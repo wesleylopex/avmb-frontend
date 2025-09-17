@@ -43,8 +43,8 @@
               <td class="text-left">{{ new Date(user.createdAt).toLocaleString() }}</td>
               <td class="text-left">
                 <div v-show="user.status === 'pending'">
-                  <q-btn @click="approve(user.email)" outline size="sm" color="green" label="Aprovar" icon="check" class="q-mr-sm" />
-                  <q-btn outline size="sm" color="red" label="Reprovar" icon="close" />
+                  <q-btn @click="approve(user.id)" outline size="sm" color="green" label="Aprovar" icon="check" class="q-mr-sm" />
+                  <q-btn @click="reject(user.id)" outline size="sm" color="red" label="Reprovar" icon="close" />
                 </div>
               </td>
             </tr>
@@ -53,16 +53,30 @@
       </div>
     </q-card>
   </q-page>
+
+  <SetStatus
+    :is-open="setStatusIsOpen"
+    :user-id="setStatusUserId"
+    :status="setStatusStatus"
+    @close="setStatusIsOpen = false"
+    @confirm="setUserStatus"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import SetStatus from './SetStatus.vue'
+
 import type { User } from 'src/types/user'
 
-import { getUsers } from '../services/user-service'
+import { getUsers, setStatus } from '../../services/user-service'
 
 const users = ref<User[]>([])
 const search = ref('')
+
+const setStatusIsOpen = ref(false)
+const setStatusUserId = ref<number | null>(null)
+const setStatusStatus = ref<'approved' | 'rejected' | null>(null)
 
 onMounted(async () => {
   try {
@@ -84,8 +98,32 @@ const filteredUsers = computed(() => {
   )
 })
 
-function approve (userEmail: string): void {
-  console.log(`Aprovando usuário com email: ${userEmail}`)
+function approve (userId: number): void {
+  setStatusUserId.value = userId
+  setStatusStatus.value = 'approved'
+  setStatusIsOpen.value = true
+}
+
+function reject (userId: number): void {
+  setStatusUserId.value = userId
+  setStatusStatus.value = 'rejected'
+  setStatusIsOpen.value = true
+}
+
+async function setUserStatus (userId: number | null, status: 'approved' | 'rejected' | null): Promise<void> {
+  try {
+    const updated = await setStatus(userId, status)
+
+    console.log(updated)
+
+    users.value = users.value.map(user => user.id === updated.id ? updated : user)
+  } catch (error) {
+    console.log(error)
+  } finally {
+    setStatusIsOpen.value = false
+    setStatusUserId.value = null
+    setStatusStatus.value = null
+  }
 }
 
 function getStatusColor (status: string): string {

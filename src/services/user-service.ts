@@ -11,3 +11,14 @@ export const getUsers = async () => {
     throw new Error(message)
   }
 }
+
+export const setStatus = async (userId: number | null, status: 'approved' | 'rejected' | null) => {
+  try {
+    const response = await api.patch(`/users/${userId}/status`, { status })
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>
+    const message = err.response?.data?.message || 'Erro ao atualizar status do usuário'
+    throw new Error(message)
+  }
+}
