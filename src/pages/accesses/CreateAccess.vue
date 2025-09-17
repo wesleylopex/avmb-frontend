@@ -11,7 +11,7 @@
 
         <q-card-section>
             <q-select
-              v-model="userId"
+              v-model="form.userId"
               :options="users"
               option-label="name"
               option-value="id"
@@ -24,7 +24,7 @@
               :rules="[required]"
             />
             <q-select
-              v-model="resourceId"
+              v-model="form.resourceId"
               :options="resources"
               option-label="name"
               option-value="id"
@@ -37,7 +37,7 @@
               :rules="[required]"
             />
             <q-input
-              v-model="expiresAt"
+              v-model="form.expiresAt"
               label="Expira em"
               type="datetime-local"
               dense
@@ -57,15 +57,20 @@
 
 <script lang="ts" setup>
 import { ref, watch, onMounted } from 'vue'
+import type { QForm } from 'quasar'
 
 import type { User } from 'src/types/user'
+import type { CreateAccessPayload } from 'src/types/access'
 import type { Resource } from 'src/types/resource'
 
 import { getUsers } from '../../services/user-service'
 import { getResources } from '../../services/resource-service'
 
-const props = defineProps<{ isOpen: boolean }>()
-const emit = defineEmits<{ (e: 'close'): void }>()
+const props = defineProps<{ isOpen: boolean, success: boolean }>()
+const emit = defineEmits<{
+  (e: 'close'): void,
+  (e: 'submit', payload: CreateAccessPayload): void
+}>()
 
 const internalOpen = ref(props.isOpen)
 
@@ -85,22 +90,33 @@ onMounted(async () => {
   }
 })
 
-const formRef = ref()
+const formRef = ref<QForm | null>(null)
 
-const userId = ref<number | null>(null)
-const resourceId = ref<number | null>(null)
-const expiresAt = ref<string>('')
+const form = ref({
+  userId: null,
+  resourceId: null,
+  expiresAt: null
+})
 
 const required = (val: string) => !!val || 'Campo obrigatório.'
 
-function onFormSubmit () {
-  const isValid = formRef.value.validate()
+async function onFormSubmit () {
+  const valid = await formRef.value?.validate()
+  if (!valid) return
 
-  if (!isValid) {
-    return
-  }
-
-  emit('close')
+  emit('submit', form.value)
 }
+
+watch(() => props.success, (newVal) => {
+  if (newVal) {
+    formRef.value?.resetValidation()
+    form.value = {
+      userId: null,
+      resourceId: null,
+      expiresAt: null
+    }
+    emit('close')
+  }
+})
 </script>
 

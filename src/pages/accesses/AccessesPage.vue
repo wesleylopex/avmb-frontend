@@ -48,9 +48,9 @@
               :key="access.id"
               :class="{ 'bg-yellow-2': isExpiringSoon(access) }"
             >
-              <td class="text-left">Bianca Sabrina</td>
-              <td class="text-left">Recursos</td>
-              <td class="text-left">Wesley Lopes</td>
+              <td class="text-left">{{ access.user.name }}</td>
+              <td class="text-left">{{ access.resource.name }}</td>
+              <td class="text-left">{{ access.grantedByUser.name }}</td>
               <td class="text-left">{{ new Date(access.grantedAt).toLocaleString() }}</td>
               <td class="text-left">{{ new Date(access.expiresAt).toLocaleString() }}</td>
               <td class="text-left">{{ access.revokedAt && new Date(access.revokedAt).toLocaleString() }}</td>
@@ -64,7 +64,12 @@
     </q-card>
   </q-page>
 
-  <CreateAccess :is-open="isCreateAccessOpen" @close="isCreateAccessOpen = false" />
+  <CreateAccess
+    :is-open="isCreateAccessOpen"
+    :success="creationSuccess"
+    @submit="handleCreateAccess"
+    @close="isCreateAccessOpen = false"
+  />
 
   <RevokeConfirmation
     :is-open="isRevokeConfirmationOpen"
@@ -77,14 +82,15 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue'
 
-import { getAccesses } from '../../services/access-service'
+import { getAccesses, createAccess } from '../../services/access-service'
 
 import CreateAccess from './CreateAccess.vue'
 import RevokeConfirmation from './RevokeConfirmation.vue'
 
-import type { Access } from '../../types/access'
+import type { Access, CreateAccessPayload } from '../../types/access'
 
 const isCreateAccessOpen = ref<boolean>(false)
+const creationSuccess = ref<boolean>(false)
 
 const isRevokeConfirmationOpen = ref<boolean>(false)
 const selectedAccessId = ref<number | null>(null)
@@ -112,6 +118,21 @@ const filteredAccesses = computed(() => {
     access.grantedByUser.name.toString().toLowerCase().includes(searchLower)
   )
 })
+
+async function handleCreateAccess (accessData: CreateAccessPayload): Promise<void> {
+  try {
+    const created = await createAccess(accessData)
+
+    if (created) {
+      accesses.value.push(created)
+
+      creationSuccess.value = true
+    }
+  } catch (error) {
+    console.log(error)
+    creationSuccess.value = false
+  }
+}
 
 function openRevokeConfirmation (accessId: number): void {
   isRevokeConfirmationOpen.value = true

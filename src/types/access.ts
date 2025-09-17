@@ -12,7 +12,7 @@ export interface Access {
 }
 
 export interface CreateAccessPayload {
-  userId: number
-  resourceId: number
-  expiresAt: string
+  userId: number | null
+  resourceId: number | null
+  expiresAt: string | null
 }
