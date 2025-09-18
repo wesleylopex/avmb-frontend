@@ -1,26 +1,49 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
-import { jwtDecode } from 'jwt-decode'
+import { getMe } from '../services/auth-service'
 
-interface JwtPayload {
-  sub: number
+export interface Resource {
+  id: number
+  name: string
+  slug: string
+  expiresAt: string
+}
+
+export interface User {
+  id: number
   name: string
   email: string
-  role: 'user' | 'admin'
+  role: string
+  resources: Resource[]
 }
+
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('token'))
-  const user = ref<JwtPayload | null>(null)
+  const user = ref<User | null>(null)
+
+  const fetchMe = async () => {
+    try {
+      const me = await getMe()
+      user.value = me
+
+      console.log(me)
+
+      return me
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  function hasResource(slug: string) {
+    return !!user.value?.resources.some(r => r.slug === slug)
+  }
+
 
   function setToken (newToken: string) {
     token.value = newToken
     localStorage.setItem('token', newToken)
-
-    if (newToken) {
-      user.value = jwtDecode<JwtPayload>(newToken)
-    }
   }
 
   function clearAuth () {
@@ -29,5 +52,5 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('token')
   }
 
-  return { token, user, setToken, clearAuth }
+  return { token, user, fetchMe, hasResource, setToken, clearAuth }
 })

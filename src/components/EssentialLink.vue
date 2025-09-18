@@ -13,15 +13,15 @@
 
 <script setup lang="ts">
 export interface EssentialLinkProps {
-  title: string;
-  caption?: string;
-  route?: object;
-  icon?: string;
+  title: string
+  caption?: string
+  route: { name: string }
+  icon?: string
 }
 
 withDefaults(defineProps<EssentialLinkProps>(), {
   caption: '',
   route: () => ({ name: 'home' }),
   icon: '',
-});
+})
 </script>

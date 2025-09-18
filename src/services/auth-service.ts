@@ -28,3 +28,14 @@ export const signup = async (signupData: SignupData) => {
     throw new Error(message)
   }
 }
+
+export const getMe = async () => {
+  try {
+    const response = await api.get('/auth/me')
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>
+    const message = err.response?.data?.message || 'Erro ao buscar usuário'
+    throw new Error(message)
+  }
+}

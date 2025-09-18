@@ -47,7 +47,7 @@ import { useRouter } from 'vue-router'
 
 import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue'
 
-const linksList: EssentialLinkProps[] = [
+const allLinksList: EssentialLinkProps[] = [
   {
     title: 'Home',
     caption: '',
@@ -64,11 +64,18 @@ const linksList: EssentialLinkProps[] = [
     title: 'Gerenciar acessos',
     caption: '',
     icon: 'lock_open',
-    route: { name: 'accesses' },
+    route: { name: 'accesses' }
   }
 ]
 
 const authStore = useAuthStore()
+
+const linksList = allLinksList.filter(link => {
+  if (link.route?.name === 'home') return true
+
+  return authStore.hasResource(link.route.name)
+})
+
 const router = useRouter()
 
 const leftDrawerOpen = ref(false)

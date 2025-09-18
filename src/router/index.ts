@@ -35,11 +35,28 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
-  Router.beforeEach((to) => {
+  Router.beforeEach(async (to) => {
     const auth = useAuthStore()
-    if (to.meta.requiresAuth && !auth.token) {
-      return { name: 'login', query: { redirect: to.fullPath } }
+
+    if (to.meta.requiresAuth) {
+      if (!auth.token) {
+        return { name: 'login', query: { redirect: to.fullPath } }
+      }
+
+      if (!auth.user) {
+        try {
+          await auth.fetchMe()
+        } catch {
+          return { name: 'login' }
+        }
+      }
+
+      if (to.name && to.name !== 'home' && !auth.hasResource(to.name as string)) {
+        return { path: '/404' }
+      }
     }
+
+    return true
   })
 
   return Router;
