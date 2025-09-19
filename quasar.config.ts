@@ -45,7 +45,7 @@ export default defineConfig((ctx) => {
 
       vueRouterMode: 'history', // available values: 'hash', 'history'
       env: {
-        API_URL: ctx.dev ? 'http://localhost:3001' : 'http://localhost:3001'
+        API_URL: ctx.dev ? 'http://localhost:3001' : 'https://avmb-backend.onrender.com'
       },
       // vueRouterBase,
       // vueDevtools,
