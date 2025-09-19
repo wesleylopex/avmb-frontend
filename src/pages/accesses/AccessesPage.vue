@@ -55,7 +55,7 @@
               <td class="text-left">{{ new Date(access.expiresAt).toLocaleString() }}</td>
               <td class="text-left">{{ access.revokedAt && new Date(access.revokedAt).toLocaleString() }}</td>
               <td class="text-left">
-                <q-btn @click="openRevokeConfirmation(access.id)" outline size="sm" color="red" label="Revogar" icon="close" />
+                <q-btn v-if="!access.revokedAt" @click="openRevokeConfirmation(access.id)" outline size="sm" color="red" label="Revogar" icon="close" />
               </td>
             </tr>
           </tbody>
@@ -89,6 +89,10 @@ import RevokeConfirmation from './RevokeConfirmation.vue'
 
 import type { Access, CreateAccessPayload } from '../../types/access'
 
+import { useAuthStore } from '../../stores/auth'
+
+const { user: loggedUser } = useAuthStore()
+
 const isCreateAccessOpen = ref<boolean>(false)
 const creationSuccess = ref<boolean>(false)
 
@@ -101,7 +105,11 @@ const accesses = ref<Access[]>([])
 
 onMounted(async () => {
   try {
-    accesses.value = await getAccesses()
+    const fetchedAccesses: Access[] = await getAccesses()
+
+    if (!loggedUser) return
+
+    accesses.value = fetchedAccesses.filter(access => access.user.id !== loggedUser.id)
   } catch (error) {
     console.log(error)
   }

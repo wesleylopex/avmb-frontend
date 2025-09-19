@@ -59,6 +59,10 @@
 import { ref, watch, onMounted } from 'vue'
 import type { QForm } from 'quasar'
 
+import { useAuthStore } from '../../stores/auth'
+
+const { user: loggedUser } = useAuthStore()
+
 import type { User } from 'src/types/user'
 import type { CreateAccessPayload } from 'src/types/access'
 import type { Resource } from 'src/types/resource'
@@ -83,7 +87,11 @@ const resources = ref<Resource[]>([])
 
 onMounted(async () => {
   try {
-    users.value = await getUsers()
+    if (!loggedUser) return
+
+    const fetchedUsers: User[] = await getUsers()
+    users.value = fetchedUsers.filter(user => user.role !== 'admin' && user.id !== loggedUser.id)
+
     resources.value = await getResources()
   } catch (error) {
     console.log(error)

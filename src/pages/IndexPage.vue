@@ -45,7 +45,7 @@
               <td class="text-left">{{ new Date(access.grantedAt).toLocaleString() }}</td>
               <td class="text-left">{{ new Date(access.expiresAt).toLocaleString() }}</td>
               <td class="text-left">
-                <q-badge color="green" label="Ativo" />
+                <q-badge :color="getAccessStatusColor(access)" :label="getAccessStatus(access)" />
               </td>
             </tr>
           </tbody>
@@ -78,4 +78,26 @@ onMounted(async () => {
     console.log(error)
   }
 })
+
+function getAccessStatus (access: Access): string {
+  if (access.revokedAt) return 'Revogado'
+
+  const expiresAt = new Date(access.expiresAt)
+  const now = new Date()
+
+  if (expiresAt < now) return 'Expirado'
+
+  return 'Ativo'
+}
+
+function getAccessStatusColor (access: Access): string {
+  if (access.revokedAt) return 'red'
+
+  const expiresAt = new Date(access.expiresAt)
+  const now = new Date()
+
+  if (expiresAt < now) return 'orange'
+
+  return 'green'
+}
 </script>

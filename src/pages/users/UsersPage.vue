@@ -84,7 +84,11 @@ const setStatusStatus = ref<'approved' | 'rejected' | null>(null)
 
 onMounted(async () => {
   try {
-    users.value = await getUsers()
+    const fetchedUsers: User[] = await getUsers()
+
+    if (!loggedUser) return
+
+    users.value = fetchedUsers.filter(user => user.id !== loggedUser.id)
   } catch (error) {
     console.log(error)
   }

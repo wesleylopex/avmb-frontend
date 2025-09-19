@@ -37,7 +37,7 @@
             />
             <q-btn
               type="submit"
-              label="Entrar"
+              label="Pronto"
               color="primary"
               class="full-width q-mt-md"
             />
