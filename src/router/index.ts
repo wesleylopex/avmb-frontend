@@ -59,5 +59,13 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     return true
   })
 
-  return Router;
+  Router.afterEach((to) => {
+    if (to.meta.title) {
+      document.title = to.meta.title as string
+    } else {
+      document.title = 'Desafio AVMB'
+    }
+  })
+
+  return Router
 });
