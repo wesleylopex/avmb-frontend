@@ -82,7 +82,7 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue'
 
-import { getAccesses, createAccess } from '../../services/access-service'
+import { getAccesses, createAccess, revokeAccess } from '../../services/access-service'
 
 import CreateAccess from './CreateAccess.vue'
 import RevokeConfirmation from './RevokeConfirmation.vue'
@@ -139,8 +139,23 @@ function openRevokeConfirmation (accessId: number): void {
   selectedAccessId.value = accessId
 }
 
-function revoke (accessId: number | null): void {
-  console.log('Revogar acesso com ID:', accessId)
+async function revoke (accessId: number | null): Promise<void> {
+  if (!accessId) return
+
+  try {
+    const revoked = await revokeAccess(accessId)
+
+    if (revoked) {
+      accesses.value = accesses.value.map(access => {
+        if (access.id === accessId) return revoked
+        return access
+      })
+
+      isRevokeConfirmationOpen.value = false
+    }
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 function isExpiringSoon (access: Access): boolean {

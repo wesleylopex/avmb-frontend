@@ -8,22 +8,18 @@
       <q-separator />
       <q-card-section class="flex q-gutter-md items-center">
         <q-btn
+          v-if="authStore.hasResource('accesses')"
           color="primary"
           label="Gerenciar Acessos"
           icon="manage_accounts"
           to="/accesses"
         />
         <q-btn
+          v-if="authStore.hasResource('users')"
           color="primary"
           label="Gerenciar Usuários"
           icon="people"
           to="/users"
-        />
-        <q-btn
-          color="primary"
-          label="Gerenciar Recursos"
-          icon="folder"
-          to="/resources"
         />
       </q-card-section>
     </q-card>
@@ -44,20 +40,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="text-left">Recursos</td>
-              <td class="text-left">01/01/2024 10:00</td>
-              <td class="text-left">01/02/2024 10:00</td>
+            <tr v-for="access in accesses" :key="access.id">
+              <td class="text-left">{{ access.resource.name }}</td>
+              <td class="text-left">{{ new Date(access.grantedAt).toLocaleString() }}</td>
+              <td class="text-left">{{ new Date(access.expiresAt).toLocaleString() }}</td>
               <td class="text-left">
                 <q-badge color="green" label="Ativo" />
-              </td>
-            </tr>
-            <tr>
-              <td class="text-left">Relatórios Financeiros</td>
-              <td class="text-left">15/12/2023 14:30</td>
-              <td class="text-left">15/01/2024 14:30</td>
-              <td class="text-left">
-                <q-badge color="red" label="Expirado" />
               </td>
             </tr>
           </tbody>
@@ -68,7 +56,26 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from 'src/stores/auth'
 
+import type { Access } from 'src/types/access'
+import { getUserAccesses } from '../services/access-service'
+
 const authStore = useAuthStore()
+
+const accesses = ref<Access[]>([])
+
+onMounted(async () => {
+  try {
+    if (!authStore.user?.id) return
+
+    const userId = Number(authStore.user.id)
+    const data = await getUserAccesses(userId)
+
+    accesses.value = data
+  } catch (error) {
+    console.log(error)
+  }
+})
 </script>

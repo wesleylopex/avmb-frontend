@@ -13,9 +13,31 @@ export const getAccesses = async () => {
   }
 }
 
+export const getUserAccesses = async (userId: number) => {
+  try {
+    const response = await api.get(`/accesses/user/${userId}`)
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>
+    const message = err.response?.data?.message || 'Erro ao consultar acessos'
+    throw new Error(message)
+  }
+}
+
 export const createAccess = async (accessData: CreateAccessPayload) => {
   try {
     const response = await api.post('/accesses', accessData)
+    return response.data
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>
+    const message = err.response?.data?.message || 'Erro ao criar acesso'
+    throw new Error(message)
+  }
+}
+
+export const revokeAccess = async (accessId: number) => {
+  try {
+    const response = await api.post(`/accesses/revoke/${accessId}`)
     return response.data
   } catch (error) {
     const err = error as AxiosError<{ message: string }>
